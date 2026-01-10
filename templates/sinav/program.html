@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block title %}Sınav Programı - Üniversite Sınav Programı{% endblock %}
+
+{% block extra_css %}
+<style>
+    .sinav-kart {
+        transition: transform 0.2s, box-shadow 0.2s;
+        border-left: 4px solid #0d6efd;
+    }
+    .sinav-kart:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    .filtre-panel {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="bi bi-calendar3"></i> Sınav Programı
+        </h1>
+    </div>
+</div>
+
+<!-- Filtreleme Paneli -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="filtre-panel">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="mb-0"><i class="bi bi-funnel"></i> Filtrele</h5>
+                {% if request.args.get('fakulte_id') or request.args.get('bolum_id') or request.args.get('baslangic_tarihi') or request.args.get('bitis_tarihi') %}
+                <a href="{{ url_for('sinav.program') }}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-x-circle"></i> Filtreleri Temizle
+                </a>
+                {% endif %}
+            </div>
+            <form method="GET" action="{{ url_for('sinav.program') }}" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Fakülte</label>
+                    <select name="fakulte_id" class="form-select" id="fakulteSelect">
+                        <option value="">Tümü</option>
+                        {% for fakulte in fakulteler %}
+                        <option value="{{ fakulte.id }}" {% if request.args.get('fakulte_id')|int == fakulte.id %}selected{% endif %}>
+                            {{ fakulte.ad }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Bölüm</label>
+                    <select name="bolum_id" class="form-select" id="bolumSelect">
+                        <option value="">Tümü</option>
+                        {% for bolum in bolumler %}
+                        <option value="{{ bolum.id }}" data-fakulte="{{ bolum.fakulte_id }}" {% if request.args.get('bolum_id')|int == bolum.id %}selected{% endif %}>
+                            {{ bolum.ad }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Başlangıç Tarihi</label>
+                    <input type="date" name="baslangic_tarihi" class="form-control" 
+                           value="{{ request.args.get('baslangic_tarihi', '') }}">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Bitiş Tarihi</label>
+                    <input type="date" name="bitis_tarihi" class="form-control" 
+                           value="{{ request.args.get('bitis_tarihi', '') }}">
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-search"></i> Filtrele
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Sonuç Bilgisi -->
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <span class="text-muted">
+                <i class="bi bi-list-check"></i> 
+                <strong>{{ sinavlar|length }}</strong> sınav bulundu
+            </span>
+        </div>
+    </div>
+</div>
+
+<!-- Sınav Listesi -->
+<div class="row">
+    {% if sinavlar %}
+        {% for sinav in sinavlar %}
+        <div class="col-md-6 col-lg-4 mb-3">
+            <div class="card sinav-kart h-100">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-book"></i> {{ sinav.ders.ad }}
+                        {% if sinav.ders.kod %}
+                        <small class="text-muted">({{ sinav.ders.kod }})</small>
+                        {% endif %}
+                    </h5>
+                    {% if sinav.ders.tum_bolumler %}
+                    <p class="mb-2">
+                        {% for bolum in sinav.ders.tum_bolumler %}
+                        <span class="badge bg-primary me-1">{{ bolum.ad }}</span>
+                        {% endfor %}
+                    </p>
+                    {% elif sinav.ders.bolum %}
+                    <p class="mb-2">
+                        <span class="badge bg-primary">{{ sinav.ders.bolum.ad }}</span>
+                    </p>
+                    {% endif %}
+                    <hr>
+                    <p class="mb-2">
+                        <i class="bi bi-calendar-event"></i> 
+                        <strong>{{ tarih_formatla(sinav.tarih) }}</strong>
+                        <span class="badge bg-info ms-2">{{ gun_adi_tr(sinav.tarih) }}</span>
+                    </p>
+                    <p class="mb-2">
+                        <i class="bi bi-clock"></i> 
+                        {{ saat_formatla(sinav.baslangic_saati) }} - {{ saat_formatla(sinav.bitis_saati) }}
+                    </p>
+                    <p class="mb-2">
+                        <i class="bi bi-person"></i> {{ sinav.ders.ogretim_uyesi.tam_ad }}
+                    </p>
+                    <p class="mb-2">
+                        <i class="bi bi-building"></i> {{ sinav.derslik.ad }}
+                        <span class="badge bg-secondary ms-2">
+                            {% if sinav.atanan_ogrenci_sayisi %}
+                                {{ sinav.atanan_ogrenci_sayisi }}/{{ sinav.derslik.kapasite }} kişi
+                            {% else %}
+                                {{ sinav.ders.ogrenci_sayisi }}/{{ sinav.derslik.kapasite }} kişi
+                            {% endif %}
+                        </span>
+                    </p>
+                    <p class="mb-0">
+                        <i class="bi bi-people"></i> {{ sinav.ders.ogrenci_sayisi }} öğrenci
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12">
+            <div class="alert alert-warning text-center">
+                <i class="bi bi-exclamation-triangle"></i> 
+                <strong>Seçilen kriterlere uygun sınav bulunamadı.</strong>
+                <br>
+                <small>
+                    {% if request.args.get('baslangic_tarihi') or request.args.get('bitis_tarihi') %}
+                    Tarih aralığını genişletmeyi veya 
+                    {% endif %}
+                    <a href="{{ url_for('sinav.program') }}">filtreleri temizlemeyi</a> deneyin.
+                </small>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+

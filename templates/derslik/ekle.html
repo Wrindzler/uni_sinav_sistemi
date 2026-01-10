@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Yeni Derslik Ekle - Üniversite Sınav Programı{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-plus-circle"></i> Yeni Derslik Ekle
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('derslik.ekle') }}">
+                    <div class="mb-3">
+                        <label for="ad" class="form-label">Derslik Adı *</label>
+                        <input type="text" class="form-control" id="ad" name="ad" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="kapasite" class="form-label">Kapasite *</label>
+                        <input type="number" class="form-control" id="kapasite" name="kapasite" 
+                               min="1" value="30" required>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="bina" class="form-label">Bina</label>
+                            <input type="text" class="form-control" id="bina" name="bina">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="kat" class="form-label">Kat</label>
+                            <input type="text" class="form-control" id="kat" name="kat">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="aciklama" class="form-label">Açıklama</label>
+                        <textarea class="form-control" id="aciklama" name="aciklama" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="sinav_icin_uygun" 
+                               name="sinav_icin_uygun" checked>
+                        <label class="form-check-label" for="sinav_icin_uygun">
+                            Sınav için uygun
+                        </label>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('derslik.liste') }}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> İptal
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Kaydet
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block title %}Sınav Planlama - Üniversite Sınav Programı{% endblock %}
+
+{% block extra_css %}
+<style>
+    .planlama-kart {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    }
+    .form-kart {
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        border-radius: 15px;
+        border: none;
+    }
+    .algoritma-bilgi {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 30px;
+    }
+    .algoritma-bilgi h5 {
+        margin-bottom: 15px;
+    }
+    .algoritma-bilgi ul {
+        list-style: none;
+        padding: 0;
+    }
+    .algoritma-bilgi li {
+        padding: 8px 0;
+        border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+    .algoritma-bilgi li:last-child {
+        border-bottom: none;
+    }
+    .algoritma-bilgi li i {
+        margin-right: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="bi bi-gear"></i> Sınav Planlama
+        </h1>
+    </div>
+</div>
+
+<!-- Algoritma Bilgisi -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="algoritma-bilgi">
+            <h5><i class="bi bi-cpu"></i> Kullanılan Planlama Algoritması</h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <h6><i class="bi bi-diagram-3"></i> Greedy + Backtracking Hibrit Yaklaşımı</h6>
+                    <ul>
+                        <li><i class="bi bi-check-circle"></i> Dersleri öğrenci sayısına göre sıralar (büyükten küçüğe)</li>
+                        <li><i class="bi bi-check-circle"></i> Her ders için en uygun zaman/derslik kombinasyonunu bulur</li>
+                        <li><i class="bi bi-check-circle"></i> Tüm kısıtlamalara uygun çözüm üretir</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h6><i class="bi bi-shield-check"></i> Kontrol Edilen Kısıtlamalar</h6>
+                    <ul>
+                        <li><i class="bi bi-check-circle"></i> Bir ders için tek sınav saati</li>
+                        <li><i class="bi bi-check-circle"></i> Derslik çakışma kontrolü</li>
+                        <li><i class="bi bi-check-circle"></i> Öğrenci çakışma kontrolü</li>
+                        <li><i class="bi bi-check-circle"></i> Kapasite kontrolü ve derslik birleştirme</li>
+                        <li><i class="bi bi-check-circle"></i> Hoca müsaitlik kontrolü</li>
+                        <li><i class="bi bi-check-circle"></i> Sınav süresi kontrolü</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card form-kart">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-calendar-range"></i> Planlama Parametreleri
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('planlama.baslat') }}">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="baslangic_tarihi" class="form-label">
+                                <i class="bi bi-calendar-event"></i> Başlangıç Tarihi
+                            </label>
+                            <input type="date" class="form-control" id="baslangic_tarihi" 
+                                   name="baslangic_tarihi" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="bitis_tarihi" class="form-label">
+                                <i class="bi bi-calendar-event-fill"></i> Bitiş Tarihi
+                            </label>
+                            <input type="date" class="form-control" id="bitis_tarihi" 
+                                   name="bitis_tarihi" required>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <strong>Uyarı:</strong> Planlama işlemi mevcut planlanmış sınavları silecektir.
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-gradient btn-lg" id="planlama-btn">
+                            <i class="bi bi-play-circle"></i> Planlamayı Başlat
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Bugünün tarihini varsayılan olarak ayarla
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date().toISOString().split('T')[0];
+    const nextWeek = new Date();
+    nextWeek.setDate(nextWeek.getDate() + 7);
+    const nextWeekStr = nextWeek.toISOString().split('T')[0];
+    
+    document.getElementById('baslangic_tarihi').value = today;
+    document.getElementById('bitis_tarihi').value = nextWeekStr;
+    
+    // Form submit'te loading göster
+    const form = document.querySelector('form');
+    const btn = document.getElementById('planlama-btn');
+    
+    form.addEventListener('submit', function() {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Planlama yapılıyor...';
+        showLoading();
+    });
+});
+</script>
+{% endblock %}
+

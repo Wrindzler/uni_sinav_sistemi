@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Derslik Duzenle - Universite Sinav Programi{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">
+                    <i class="bi bi-pencil"></i> Derslik Duzenle: {{ derslik.ad }}
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('derslik.duzenle', derslik_id=derslik.id) }}">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="ad" class="form-label">Derslik Adi *</label>
+                            <input type="text" class="form-control" id="ad" name="ad" 
+                                   value="{{ derslik.ad }}" required>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="kapasite" class="form-label">Kapasite *</label>
+                            <input type="number" class="form-control" id="kapasite" name="kapasite" 
+                                   min="1" value="{{ derslik.kapasite }}" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="bina" class="form-label">Bina</label>
+                            <input type="text" class="form-control" id="bina" name="bina" 
+                                   value="{{ derslik.bina or '' }}" placeholder="Orn: M Blok, D Blok">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="kat" class="form-label">Kat</label>
+                            <input type="text" class="form-control" id="kat" name="kat" 
+                                   value="{{ derslik.kat or '' }}" placeholder="Orn: 1. Kat, Zemin">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="aciklama" class="form-label">Aciklama</label>
+                        <textarea class="form-control" id="aciklama" name="aciklama" rows="2">{{ derslik.aciklama or '' }}</textarea>
+                    </div>
+                    
+                    {% if tum_derslikler %}
+                    <div class="mb-3">
+                        <label for="yakinliklar" class="form-label">
+                            <i class="bi bi-geo-alt"></i> Yakin Derslikler
+                        </label>
+                        <select class="form-select" id="yakinliklar" name="yakinliklar" multiple size="6">
+                            {% for d in tum_derslikler %}
+                            <option value="{{ d.id }}" {% if d.id in mevcut_yakinlik_idleri %}selected{% endif %}>
+                                {{ d.ad }} {% if d.bina %}({{ d.bina }}){% endif %}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <div class="form-text">
+                            <i class="bi bi-info-circle"></i> 
+                            Ctrl tusuna basili tutarak birden fazla derslik secebilirsiniz.
+                            {% if derslik.yakinliklar %}
+                            <br><strong>Mevcut:</strong> {{ derslik.yakinliklar|join(', ') }}
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> Henuz baska derslik yok.
+                    </div>
+                    {% endif %}
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="sinav_icin_uygun" 
+                               name="sinav_icin_uygun" {% if derslik.sinav_icin_uygun %}checked{% endif %}>
+                        <label class="form-check-label" for="sinav_icin_uygun">
+                            <i class="bi bi-check-circle"></i> Sinav icin uygun
+                        </label>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('derslik.liste') }}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Iptal
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Guncelle
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    select[multiple] {
+        min-height: 150px;
+    }
+</style>
+{% endblock %}

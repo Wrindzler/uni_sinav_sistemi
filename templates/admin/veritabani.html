@@ -1,0 +1,325 @@
+{% extends "base.html" %}
+
+{% block title %}Veritabanı Görüntüle - Üniversite Sınav Programı{% endblock %}
+{% block page_title %}Veritabanı Görüntüle{% endblock %}
+
+{% block extra_css %}
+<style>
+    .table-container {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+        overflow: hidden;
+        margin-bottom: 20px;
+    }
+    
+    .table-header {
+        background: linear-gradient(135deg, #1B365D 0%, #0EA5E9 100%);
+        color: white;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .table-header h5 {
+        margin: 0;
+        font-weight: 600;
+    }
+    
+    .table-header .badge {
+        background: rgba(255,255,255,0.2);
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+    }
+    
+    .table-responsive {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    
+    .db-table {
+        width: 100%;
+        font-size: 0.85rem;
+        margin: 0;
+    }
+    
+    .db-table thead th {
+        background: #f8fafc;
+        color: #1E293B;
+        font-weight: 600;
+        padding: 12px 10px;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        border-bottom: 2px solid #e2e8f0;
+    }
+    
+    .db-table tbody td {
+        padding: 10px;
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: middle;
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    
+    .db-table tbody tr:hover {
+        background: #f8fafc;
+    }
+    
+    .db-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+    
+    .nav-tabs-custom {
+        border-bottom: 2px solid #e2e8f0;
+        flex-wrap: wrap;
+        gap: 5px;
+        padding: 10px 0;
+    }
+    
+    .nav-tabs-custom .nav-link {
+        border: none;
+        color: #64748B;
+        padding: 10px 20px;
+        border-radius: 10px;
+        font-weight: 500;
+        transition: all 0.3s;
+        background: #f8fafc;
+        margin: 2px;
+    }
+    
+    .nav-tabs-custom .nav-link:hover {
+        background: #e2e8f0;
+        color: #1E293B;
+    }
+    
+    .nav-tabs-custom .nav-link.active {
+        background: linear-gradient(135deg, #1B365D 0%, #0EA5E9 100%);
+        color: white;
+    }
+    
+    .empty-table {
+        text-align: center;
+        padding: 40px;
+        color: #94a3b8;
+    }
+    
+    .empty-table i {
+        font-size: 3rem;
+        margin-bottom: 15px;
+        display: block;
+    }
+    
+    .back-btn {
+        background: linear-gradient(135deg, #1B365D 0%, #0EA5E9 100%);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 12px;
+        font-weight: 600;
+        border: none;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s;
+    }
+    
+    .back-btn:hover {
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+    }
+    
+    .info-card {
+        background: linear-gradient(135deg, #1B365D 0%, #0EA5E9 100%);
+        color: white;
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .info-card h4 {
+        margin: 0 0 10px 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .info-card p {
+        margin: 0;
+        opacity: 0.9;
+        font-size: 0.9rem;
+    }
+    
+    .search-box {
+        position: relative;
+        margin-bottom: 15px;
+    }
+    
+    .search-box input {
+        width: 100%;
+        padding: 12px 15px 12px 45px;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        transition: all 0.3s;
+    }
+    
+    .search-box input:focus {
+        outline: none;
+        border-color: #0EA5E9;
+        box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+    }
+    
+    .search-box i {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+    }
+    
+    .null-value {
+        color: #94a3b8;
+        font-style: italic;
+    }
+    
+    .bool-true {
+        color: #22c55e;
+        font-weight: 600;
+    }
+    
+    .bool-false {
+        color: #ef4444;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <a href="{{ url_for('admin.dashboard') }}" class="back-btn">
+        <i class="bi bi-arrow-left"></i> Yönetim Paneline Dön
+    </a>
+</div>
+
+<div class="info-card">
+    <h4><i class="bi bi-database"></i> Veritabanı Yönetimi</h4>
+    <p>Bu sayfada tüm veritabanı tablolarını ve içeriklerini görüntüleyebilirsiniz. Tablolar arasında geçiş yapmak için sekmeleri kullanın.</p>
+</div>
+
+<!-- Tab Navigation -->
+<ul class="nav nav-tabs-custom mb-4" id="tabloTabs" role="tablist">
+    {% for tablo_adi, tablo in tablolar.items() %}
+    <li class="nav-item" role="presentation">
+        <button class="nav-link {% if loop.first %}active{% endif %}" 
+                id="tab-{{ loop.index }}" 
+                data-bs-toggle="tab" 
+                data-bs-target="#content-{{ loop.index }}" 
+                type="button" 
+                role="tab">
+            {{ tablo_adi }}
+            <span class="badge bg-light text-dark ms-1">{{ tablo.veriler|length }}</span>
+        </button>
+    </li>
+    {% endfor %}
+</ul>
+
+<!-- Tab Content -->
+<div class="tab-content" id="tabloTabContent">
+    {% for tablo_adi, tablo in tablolar.items() %}
+    <div class="tab-pane fade {% if loop.first %}show active{% endif %}" 
+         id="content-{{ loop.index }}" 
+         role="tabpanel">
+        
+        <div class="table-container">
+            <div class="table-header">
+                <h5><i class="bi bi-table me-2"></i>{{ tablo_adi }}</h5>
+                <span class="badge">{{ tablo.veriler|length }} kayıt</span>
+            </div>
+            
+            <!-- Tablo Arama -->
+            <div class="p-3 border-bottom">
+                <div class="search-box">
+                    <i class="bi bi-search"></i>
+                    <input type="text" 
+                           class="table-search" 
+                           data-table="table-{{ loop.index }}"
+                           placeholder="{{ tablo_adi }} tablosunda ara...">
+                </div>
+            </div>
+            
+            {% if tablo.veriler %}
+            <div class="table-responsive">
+                <table class="db-table" id="table-{{ loop.index }}">
+                    <thead>
+                        <tr>
+                            {% for kolon in tablo.kolonlar %}
+                            <th>{{ kolon }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for satir in tablo.veriler %}
+                        <tr>
+                            {% for kolon in tablo.kolonlar %}
+                            <td title="{{ satir[kolon] if satir[kolon] is not none else 'NULL' }}">
+                                {% set deger = satir[kolon] %}
+                                {% if deger is none %}
+                                    <span class="null-value">NULL</span>
+                                {% elif deger is sameas true %}
+                                    <span class="bool-true">✓ Evet</span>
+                                {% elif deger is sameas false %}
+                                    <span class="bool-false">✗ Hayır</span>
+                                {% else %}
+                                    {{ deger }}
+                                {% endif %}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-table">
+                <i class="bi bi-inbox"></i>
+                <p>Bu tabloda henüz kayıt bulunmuyor.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Tablo arama işlevi
+    document.querySelectorAll('.table-search').forEach(function(input) {
+        input.addEventListener('keyup', function() {
+            const tableId = this.getAttribute('data-table');
+            const table = document.getElementById(tableId);
+            const searchText = this.value.toLowerCase();
+            
+            if (table) {
+                const rows = table.querySelectorAll('tbody tr');
+                rows.forEach(function(row) {
+                    const text = row.textContent.toLowerCase();
+                    row.style.display = text.includes(searchText) ? '' : 'none';
+                });
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

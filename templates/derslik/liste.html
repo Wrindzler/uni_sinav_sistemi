@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Derslikler - Üniversite Sınav Programı{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-building"></i> Derslikler</h1>
+        <a href="{{ url_for('derslik.ekle') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Yeni Derslik Ekle
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Derslik Adı</th>
+                                <th>Kapasite</th>
+                                <th>Bina</th>
+                                <th>Kat</th>
+                                <th>Yakın Derslikler</th>
+                                <th>Durum</th>
+                                <th>İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for derslik in derslikler %}
+                            <tr>
+                                <td>{{ derslik.ad }}</td>
+                                <td><span class="badge bg-info">{{ derslik.kapasite }} kişi</span></td>
+                                <td>{{ derslik.bina or '-' }}</td>
+                                <td>{{ derslik.kat or '-' }}</td>
+                                <td>
+                                    {% if derslik.yakinliklar %}
+                                        <small>{{ derslik.yakinliklar|join(', ') }}</small>
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if derslik.sinav_icin_uygun %}
+                                    <span class="badge bg-success">Uygun</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">Uygun Değil</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('derslik.duzenle', derslik_id=derslik.id) }}"
+                                       class="btn btn-sm btn-warning">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form method="POST" action="{{ url_for('derslik.sil', derslik_id=derslik.id) }}"
+                                          class="d-inline" onsubmit="return confirm('Bu dersliği silmek istediğinize emin misiniz?');">
+                                        <button type="submit" class="btn btn-sm btn-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

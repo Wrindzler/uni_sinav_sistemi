@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Özel Durumlar - Üniversite Sınav Programı{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-exclamation-triangle"></i> Özel Durumlar</h1>
+        <a href="{{ url_for('ozel_durum.ekle') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Yeni Özel Durum Ekle
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Durum Türü</th>
+                                <th>Ders</th>
+                                <th>Öğretim Üyesi</th>
+                                <th>Detay</th>
+                                <th>İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ozel_durum in ozel_durumlar %}
+                            <tr>
+                                <td>
+                                    <span class="badge bg-{% if ozel_durum.durum_turu == 'hoca_musaitlik' %}info{% elif ozel_durum.durum_turu == 'ders_sinav_yok' %}danger{% elif ozel_durum.durum_turu == 'ozel_sinif' %}success{% else %}warning{% endif %}">
+                                        {% if ozel_durum.durum_turu == 'hoca_musaitlik' %}
+                                            Hoca Müsaitlik
+                                        {% elif ozel_durum.durum_turu == 'ders_sinav_yok' %}
+                                            Sınav Yok
+                                        {% elif ozel_durum.durum_turu == 'ozel_sinif' %}
+                                            Özel Sınıf
+                                        {% elif ozel_durum.durum_turu == 'ozel_sure' %}
+                                            Özel Süre
+                                        {% else %}
+                                            {{ ozel_durum.durum_turu }}
+                                        {% endif %}
+                                    </span>
+                                </td>
+                                <td>{{ ozel_durum.ders.ad if ozel_durum.ders else '-' }}</td>
+                                <td>{{ ozel_durum.ogretim_uyesi.tam_ad if ozel_durum.ogretim_uyesi else '-' }}</td>
+                                <td>
+                                    {% if ozel_durum.durum_turu == 'hoca_musaitlik' %}
+                                        <small>
+                                            <strong>Günler:</strong> {{ ozel_durum.musait_gunler or '-' }}<br>
+                                            {% if ozel_durum.baslangic_tarihi and ozel_durum.bitis_tarihi %}
+                                            <strong>Tarih:</strong> {{ ozel_durum.baslangic_tarihi }} - {{ ozel_durum.bitis_tarihi }}
+                                            {% endif %}
+                                        </small>
+                                    {% elif ozel_durum.durum_turu == 'ozel_sure' %}
+                                        <strong>{{ ozel_durum.ozel_sinav_suresi }} dakika</strong>
+                                    {% elif ozel_durum.durum_turu == 'ozel_sinif' %}
+                                        <strong>{{ ozel_durum.ozel_sinif_adi }}</strong> ({{ ozel_durum.ozel_sinif_kapasitesi }} kişi)
+                                    {% elif ozel_durum.durum_turu == 'ders_sinav_yok' %}
+                                        <span class="text-muted">Bu ders için sınav yapılmayacak</span>
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <form method="POST" action="{{ url_for('ozel_durum.sil', ozel_durum_id=ozel_durum.id) }}" 
+                                          class="d-inline" onsubmit="return confirm('Bu özel durumu silmek istediğinize emin misiniz?');">
+                                        <button type="submit" class="btn btn-sm btn-danger" title="Sil">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">
+                                    <i class="bi bi-inbox"></i> Henüz özel durum bulunmuyor
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

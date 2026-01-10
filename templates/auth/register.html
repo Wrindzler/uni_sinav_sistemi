@@ -1,0 +1,325 @@
+{% extends "base.html" %}
+
+{% block title %}Yeni Kullanıcı - Üniversite Sınav Programı{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-person-plus"></i> Yeni Kullanıcı Ekle
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('auth.register') }}" id="registerForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="kullanici_adi" class="form-label">Kullanıcı Adı *</label>
+                            <input type="text" class="form-control" id="kullanici_adi" name="kullanici_adi" required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="email" class="form-label">E-posta *</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="sifre" class="form-label">Şifre *</label>
+                            <input type="password" class="form-control" id="sifre" name="sifre" required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="rol" class="form-label">Rol *</label>
+                            <select class="form-select" id="rol" name="rol" required>
+                                <option value="">Seçiniz...</option>
+                                <option value="admin">Admin</option>
+                                <option value="bolum_yetkilisi">Bölüm Yetkilisi</option>
+                                <option value="hoca">Öğretim Görevlisi</option>
+                                <option value="ogrenci">Öğrenci</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Öğrenci için ek alanlar -->
+                    <div id="ogrenciFields" style="display: none;">
+                        <hr>
+                        <h6 class="text-primary mb-3"><i class="bi bi-person-badge"></i> Öğrenci Bilgileri</h6>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="ogrenci_no" class="form-label">Öğrenci Numarası *</label>
+                                <input type="text" class="form-control" id="ogrenci_no" name="ogrenci_no">
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label for="ogrenci_ad" class="form-label">Ad *</label>
+                                <input type="text" class="form-control" id="ogrenci_ad" name="ogrenci_ad">
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label for="ogrenci_soyad" class="form-label">Soyad *</label>
+                                <input type="text" class="form-control" id="ogrenci_soyad" name="ogrenci_soyad">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="ogrenci_fakulte_id" class="form-label">Fakülte *</label>
+                                <select class="form-select" id="ogrenci_fakulte_id" name="ogrenci_fakulte_id">
+                                    <option value="">Seçiniz...</option>
+                                    {% for fakulte in fakulteler %}
+                                    <option value="{{ fakulte.id }}">{{ fakulte.ad }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="ogrenci_bolum_id" class="form-label">Bölüm *</label>
+                                <select class="form-select" id="ogrenci_bolum_id" name="ogrenci_bolum_id">
+                                    <option value="">Önce fakülte seçiniz...</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Öğretim Görevlisi için ek alanlar -->
+                    <div id="hocaFields" style="display: none;">
+                        <hr>
+                        <h6 class="text-primary mb-3"><i class="bi bi-person-workspace"></i> Öğretim Görevlisi Bilgileri</h6>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="hoca_ad" class="form-label">Ad *</label>
+                                <input type="text" class="form-control" id="hoca_ad" name="hoca_ad">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="hoca_soyad" class="form-label">Soyad *</label>
+                                <input type="text" class="form-control" id="hoca_soyad" name="hoca_soyad">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="hoca_fakulte_id" class="form-label">Fakülte *</label>
+                                <select class="form-select" id="hoca_fakulte_id" name="hoca_fakulte_id">
+                                    <option value="">Seçiniz...</option>
+                                    {% for fakulte in fakulteler %}
+                                    <option value="{{ fakulte.id }}">{{ fakulte.ad }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="hoca_bolum_id" class="form-label">Bölüm *</label>
+                                <select class="form-select" id="hoca_bolum_id" name="hoca_bolum_id">
+                                    <option value="">Önce fakülte seçiniz...</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bölüm Yetkilisi için ek alanlar -->
+                    <div id="bolumYetkilisiFields" style="display: none;">
+                        <hr>
+                        <h6 class="text-primary mb-3"><i class="bi bi-briefcase"></i> Bölüm Yetkilisi Bilgileri</h6>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="yetkilisi_ad" class="form-label">Ad *</label>
+                                <input type="text" class="form-control" id="yetkilisi_ad" name="yetkilisi_ad">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="yetkilisi_soyad" class="form-label">Soyad *</label>
+                                <input type="text" class="form-control" id="yetkilisi_soyad" name="yetkilisi_soyad">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="yetkilisi_fakulte_id" class="form-label">Fakülte *</label>
+                                <select class="form-select" id="yetkilisi_fakulte_id" name="yetkilisi_fakulte_id">
+                                    <option value="">Seçiniz...</option>
+                                    {% for fakulte in fakulteler %}
+                                    <option value="{{ fakulte.id }}">{{ fakulte.ad }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="yetkilisi_bolum_id" class="form-label">Bölüm *</label>
+                                <select class="form-select" id="yetkilisi_bolum_id" name="yetkilisi_bolum_id">
+                                    <option value="">Önce fakülte seçiniz...</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <a href="{{ url_for('admin.kullanicilar') }}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> İptal
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Kaydet
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Rol değiştiğinde ilgili alanları göster/gizle
+document.getElementById('rol').addEventListener('change', function() {
+    var ogrenciFields = document.getElementById('ogrenciFields');
+    var hocaFields = document.getElementById('hocaFields');
+    var bolumYetkilisiFields = document.getElementById('bolumYetkilisiFields');
+
+    // Öğrenci alanları
+    var ogrenciNo = document.getElementById('ogrenci_no');
+    var ogrenciAd = document.getElementById('ogrenci_ad');
+    var ogrenciSoyad = document.getElementById('ogrenci_soyad');
+    var ogrenciFakulteId = document.getElementById('ogrenci_fakulte_id');
+    var ogrenciBolumId = document.getElementById('ogrenci_bolum_id');
+
+    // Hoca alanları
+    var hocaAd = document.getElementById('hoca_ad');
+    var hocaSoyad = document.getElementById('hoca_soyad');
+    var hocaFakulteId = document.getElementById('hoca_fakulte_id');
+    var hocaBolumId = document.getElementById('hoca_bolum_id');
+
+    // Bölüm yetkilisi alanları
+    var yetkilisiAd = document.getElementById('yetkilisi_ad');
+    var yetkilisiSoyad = document.getElementById('yetkilisi_soyad');
+    var yetkilisiFakulteId = document.getElementById('yetkilisi_fakulte_id');
+    var yetkilisiBolumId = document.getElementById('yetkilisi_bolum_id');
+
+    if (this.value === 'ogrenci') {
+        ogrenciFields.style.display = 'block';
+        hocaFields.style.display = 'none';
+        bolumYetkilisiFields.style.display = 'none';
+        // Öğrenci alanlarını zorunlu yap
+        ogrenciNo.required = true;
+        ogrenciAd.required = true;
+        ogrenciSoyad.required = true;
+        ogrenciFakulteId.required = true;
+        ogrenciBolumId.required = true;
+        // Diğerlerini zorunlu olmaktan çıkar
+        hocaAd.required = false;
+        hocaSoyad.required = false;
+        hocaFakulteId.required = false;
+        hocaBolumId.required = false;
+        yetkilisiAd.required = false;
+        yetkilisiSoyad.required = false;
+        yetkilisiFakulteId.required = false;
+        yetkilisiBolumId.required = false;
+    } else if (this.value === 'hoca') {
+        ogrenciFields.style.display = 'none';
+        hocaFields.style.display = 'block';
+        bolumYetkilisiFields.style.display = 'none';
+        // Hoca alanlarını zorunlu yap
+        hocaAd.required = true;
+        hocaSoyad.required = true;
+        hocaFakulteId.required = true;
+        hocaBolumId.required = true;
+        // Diğerlerini zorunlu olmaktan çıkar
+        ogrenciNo.required = false;
+        ogrenciAd.required = false;
+        ogrenciSoyad.required = false;
+        ogrenciFakulteId.required = false;
+        ogrenciBolumId.required = false;
+        yetkilisiAd.required = false;
+        yetkilisiSoyad.required = false;
+        yetkilisiFakulteId.required = false;
+        yetkilisiBolumId.required = false;
+    } else if (this.value === 'bolum_yetkilisi') {
+        ogrenciFields.style.display = 'none';
+        hocaFields.style.display = 'none';
+        bolumYetkilisiFields.style.display = 'block';
+        // Bölüm yetkilisi alanlarını zorunlu yap
+        yetkilisiAd.required = true;
+        yetkilisiSoyad.required = true;
+        yetkilisiFakulteId.required = true;
+        yetkilisiBolumId.required = true;
+        // Diğerlerini zorunlu olmaktan çıkar
+        ogrenciNo.required = false;
+        ogrenciAd.required = false;
+        ogrenciSoyad.required = false;
+        ogrenciFakulteId.required = false;
+        ogrenciBolumId.required = false;
+        hocaAd.required = false;
+        hocaSoyad.required = false;
+        hocaFakulteId.required = false;
+        hocaBolumId.required = false;
+    } else {
+        ogrenciFields.style.display = 'none';
+        hocaFields.style.display = 'none';
+        bolumYetkilisiFields.style.display = 'none';
+        // Tüm alanları zorunlu olmaktan çıkar
+        ogrenciNo.required = false;
+        ogrenciAd.required = false;
+        ogrenciSoyad.required = false;
+        ogrenciFakulteId.required = false;
+        ogrenciBolumId.required = false;
+        hocaAd.required = false;
+        hocaSoyad.required = false;
+        hocaFakulteId.required = false;
+        hocaBolumId.required = false;
+        yetkilisiAd.required = false;
+        yetkilisiSoyad.required = false;
+        yetkilisiFakulteId.required = false;
+        yetkilisiBolumId.required = false;
+    }
+});
+
+// Fakülte değiştiğinde bölümleri yükle (Öğrenci için)
+document.getElementById('ogrenci_fakulte_id').addEventListener('change', function() {
+    loadBolumler(this.value, 'ogrenci_bolum_id');
+});
+
+// Fakülte değiştiğinde bölümleri yükle (Hoca için)
+document.getElementById('hoca_fakulte_id').addEventListener('change', function() {
+    loadBolumler(this.value, 'hoca_bolum_id');
+});
+
+// Fakülte değiştiğinde bölümleri yükle (Bölüm Yetkilisi için)
+document.getElementById('yetkilisi_fakulte_id').addEventListener('change', function() {
+    loadBolumler(this.value, 'yetkilisi_bolum_id');
+});
+
+// Bölümleri yükleyen fonksiyon
+function loadBolumler(fakulteId, targetSelectId) {
+    var bolumSelect = document.getElementById(targetSelectId);
+
+    // Bölüm dropdown'ını temizle
+    bolumSelect.innerHTML = '<option value="">Bölüm yükleniyor...</option>';
+
+    if (fakulteId) {
+        // AJAX ile bölümleri getir
+        fetch('/auth/get_bolumler/' + fakulteId)
+            .then(response => response.json())
+            .then(data => {
+                bolumSelect.innerHTML = '<option value="">Seçiniz...</option>';
+                data.bolumler.forEach(function(bolum) {
+                    var option = document.createElement('option');
+                    option.value = bolum.id;
+                    option.textContent = bolum.ad;
+                    bolumSelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                bolumSelect.innerHTML = '<option value="">Hata oluştu!</option>';
+                console.error('Error:', error);
+            });
+    } else {
+        bolumSelect.innerHTML = '<option value="">Önce fakülte seçiniz...</option>';
+    }
+}
+</script>
+{% endblock %}
+

@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}Benim Sınavlarım - Üniversite Sınav Programı{% endblock %}
+
+{% block extra_css %}
+<style>
+    .sinav-kart {
+        transition: transform 0.2s, box-shadow 0.2s;
+        border-left: 4px solid #0d6efd;
+        margin-bottom: 20px;
+    }
+    .sinav-kart:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    .baslik-banner {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    }
+    .sinav-tarih-grup {
+        margin-bottom: 30px;
+    }
+    .tarih-baslik {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        border-left: 5px solid #0d6efd;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Başlık Banner -->
+<div class="baslik-banner">
+    <h1 class="mb-2">
+        <i class="bi bi-calendar-check"></i> Benim Sınavlarım
+    </h1>
+    <p class="mb-0">
+        {% if kullanici_tipi == 'hoca' %}
+            <i class="bi bi-person-badge"></i> Verdiğim Derslerin Sınav Programı
+        {% elif kullanici_tipi == 'ogrenci' %}
+            <i class="bi bi-person"></i> Kayıtlı Olduğum Derslerin Sınav Programı
+        {% endif %}
+    </p>
+</div>
+
+<!-- İstatistikler -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-center border-primary">
+            <div class="card-body">
+                <h3 class="text-primary">{{ sinavlar|length }}</h3>
+                <p class="mb-0">Toplam Sınav</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center border-success">
+            <div class="card-body">
+                <h3 class="text-success">
+                    {% set farkli_dersler = sinavlar | map(attribute='ders_id') | unique | list | length %}
+                    {{ farkli_dersler }}
+                </h3>
+                <p class="mb-0">Farklı Ders</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center border-info">
+            <div class="card-body">
+                <h3 class="text-info">
+                    {% set farkli_gunler = sinavlar | map(attribute='tarih') | unique | list | length %}
+                    {{ farkli_gunler }}
+                </h3>
+                <p class="mb-0">Farklı Gün</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sınav Listesi -->
+{% if sinavlar %}
+    {% set sinavlar_tarih_grubu = sinavlar | groupby('tarih') %}
+    
+    {% for tarih, tarih_sinavlari in sinavlar_tarih_grubu %}
+    <div class="sinav-tarih-grup">
+        <div class="tarih-baslik">
+            <h4 class="mb-0">
+                <i class="bi bi-calendar3"></i>
+                {{ tarih_formatla(tarih) }}
+                <span class="badge bg-info ms-2">{{ gun_adi_tr(tarih) }}</span>
+                <span class="badge bg-secondary ms-2">{{ tarih_sinavlari|length }} Sınav</span>
+            </h4>
+        </div>
+        
+        <div class="row">
+            {% for sinav in tarih_sinavlari %}
+            <div class="col-md-6 col-lg-4 mb-3">
+                <div class="card sinav-kart h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="bi bi-book"></i> {{ sinav.ders.ad }}
+                            {% if sinav.ders.kod %}
+                            <small class="text-muted">({{ sinav.ders.kod }})</small>
+                            {% endif %}
+                        </h5>
+                        <hr>
+                        <p class="mb-2">
+                            <i class="bi bi-clock"></i> 
+                            <strong>{{ saat_formatla(sinav.baslangic_saati) }} - {{ saat_formatla(sinav.bitis_saati) }}</strong>
+                        </p>
+                        {% if kullanici_tipi == 'ogrenci' %}
+                        <p class="mb-2">
+                            <i class="bi bi-person-badge"></i> {{ sinav.ders.ogretim_uyesi.tam_ad }}
+                        </p>
+                        {% endif %}
+                        <p class="mb-2">
+                            <i class="bi bi-building"></i> {{ sinav.derslik.ad }}
+                            <span class="badge bg-secondary ms-2">{{ sinav.derslik.kapasite }} kişi</span>
+                        </p>
+                        <p class="mb-2">
+                            <i class="bi bi-people"></i> {{ sinav.ders.ogrenci_sayisi }} öğrenci
+                        </p>
+                        {% if sinav.ders.sinav_turu %}
+                        <p class="mb-0">
+                            <i class="bi bi-clipboard"></i>
+                            <span class="badge bg-info">{{ sinav.ders.sinav_turu|capitalize }}</span>
+                            <span class="badge bg-warning text-dark">{{ sinav.ders.sinav_suresi }} dk</span>
+                        </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+    
+    <!-- Yazdır Butonu -->
+    <div class="row mt-4">
+        <div class="col-12 text-center">
+            <button class="btn btn-primary btn-lg" onclick="window.print()">
+                <i class="bi bi-printer"></i> Yazdır
+            </button>
+        </div>
+    </div>
+    
+{% else %}
+    <div class="alert alert-info text-center">
+        <i class="bi bi-info-circle"></i> 
+        {% if kullanici_tipi == 'hoca' %}
+            Verdiğiniz dersler için henüz planlanmış sınav bulunmamaktadır.
+        {% elif kullanici_tipi == 'ogrenci' %}
+            Kayıtlı olduğunuz dersler için henüz planlanmış sınav bulunmamaktadır.
+        {% endif %}
+    </div>
+{% endif %}
+
+<!-- Yazdırma için CSS -->
+<style media="print">
+    .navbar, .btn, .baslik-banner .badge {
+        display: none !important;
+    }
+    .sinav-kart {
+        page-break-inside: avoid;
+        border: 1px solid #ddd !important;
+    }
+    .baslik-banner {
+        background: #667eea !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+</style>
+{% endblock %}
+

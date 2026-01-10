@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+
+{% block title %}Öğretim Üyesi Paneli - Üniversite Sınav Programı{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>
+                <i class="bi bi-person-workspace"></i> Öğretim Üyesi Paneli
+            </h1>
+            <a href="{{ url_for('ogretim_uyesi.ders_yukle') }}" class="btn btn-success btn-lg">
+                <i class="bi bi-cloud-upload"></i> Excel'den Ders Yükle
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Hoşgeldin Kartı -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card border-primary">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-auto">
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" 
+                             style="width: 80px; height: 80px; font-size: 2rem;">
+                            <i class="bi bi-person-badge"></i>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <h3 class="mb-1">Hoş Geldiniz, {{ ogretim_uyesi.unvan }} {{ ogretim_uyesi.tam_ad }}</h3>
+                        <p class="text-muted mb-0">
+                            <i class="bi bi-building"></i>
+                            {% if atanmis_bolumler and atanmis_bolumler|length > 0 %}
+                                {% for bolum in atanmis_bolumler %}
+                                    <span class="badge bg-secondary me-1">{{ bolum.ad }}</span>
+                                {% endfor %}
+                            {% elif ogretim_uyesi.bolum %}
+                                {{ ogretim_uyesi.bolum.ad }}
+                            {% else %}
+                                -
+                            {% endif %}
+                            {% if ogretim_uyesi.fakulte %}
+                            | <i class="bi bi-bank"></i> {{ ogretim_uyesi.fakulte.ad }}
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="col-auto text-end">
+                        <div class="h2 mb-0">
+                            <span class="badge bg-info">{{ dersler|length }} Ders</span>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-primary mt-2" data-bs-toggle="modal" data-bs-target="#bolumModal">
+                            <i class="bi bi-pencil"></i> Bölümlerimi Düzenle
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bölüm Seçim Modal -->
+<div class="modal fade" id="bolumModal" tabindex="-1" aria-labelledby="bolumModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="bolumModalLabel">
+                    <i class="bi bi-building"></i> Bölümlerimi Düzenle
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+            <form method="POST" action="{{ url_for('ogretim_uyesi.bolum_guncelle') }}">
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        Birden fazla bölümde ders verebiliyorsanız, ilgili bölümleri seçin.
+                    </div>
+                    <div class="row">
+                        {% for bolum in tum_bolumler %}
+                        <div class="col-md-6 mb-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="bolum_ids" 
+                                       value="{{ bolum.id }}" id="bolum_{{ bolum.id }}"
+                                       {% if bolum in atanmis_bolumler %}checked{% endif %}>
+                                <label class="form-check-label" for="bolum_{{ bolum.id }}">
+                                    <strong>{{ bolum.ad }}</strong>
+                                    <small class="text-muted d-block">{{ bolum.fakulte.ad if bolum.fakulte else '' }}</small>
+                                </label>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-lg"></i> Kaydet
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Derslerim -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-book"></i> Derslerim</h5>
+                <a href="{{ url_for('ogretim_uyesi.ders_yukle') }}" class="btn btn-light btn-sm">
+                    <i class="bi bi-plus-circle"></i> Yeni Ders Ekle
+                </a>
+            </div>
+            <div class="card-body">
+                {% if dersler %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Ders Kodu</th>
+                                <th>Ders Adı</th>
+                                <th>Bölümler</th>
+                                <th>Öğrenci Sayısı</th>
+                                <th>Sınav Süresi</th>
+                                <th>İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ders in dersler %}
+                            <tr>
+                                <td><strong>{{ ders.kod }}</strong></td>
+                                <td>{{ ders.ad }}</td>
+                                <td>
+                                    {% for bolum in ders.tum_bolumler %}
+                                        <span class="badge bg-primary me-1">{{ bolum.ad }}</span>
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    <span class="badge bg-info">{{ ders.ogrenci_sayisi }} öğrenci</span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary">{{ ders.sinav_suresi }} dk</span>
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-outline-primary" 
+                                            data-bs-toggle="modal" data-bs-target="#dersBolumModal{{ ders.id }}"
+                                            title="Bölümleri Düzenle">
+                                        <i class="bi bi-building-gear"></i> Bölümler
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-inbox text-muted" style="font-size: 4rem;"></i>
+                    <h4 class="text-muted mt-3">Henüz ders bulunmuyor</h4>
+                    <p class="text-muted">Excel dosyası yükleyerek ders ve öğrenci ekleyebilirsiniz.</p>
+                    <a href="{{ url_for('ogretim_uyesi.ders_yukle') }}" class="btn btn-success">
+                        <i class="bi bi-cloud-upload"></i> Excel'den Ders Yükle
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hızlı Erişim -->
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card border-success">
+            <div class="card-body text-center">
+                <i class="bi bi-cloud-upload text-success" style="font-size: 3rem;"></i>
+                <h5 class="mt-3">Ders ve Öğrenci Yükle</h5>
+                <p class="text-muted small">Excel dosyasından ders oluşturun ve öğrencileri kaydedin</p>
+                <a href="{{ url_for('ogretim_uyesi.ders_yukle') }}" class="btn btn-success">
+                    <i class="bi bi-upload"></i> Yükle
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card border-info">
+            <div class="card-body text-center">
+                <i class="bi bi-calendar-check text-info" style="font-size: 3rem;"></i>
+                <h5 class="mt-3">Sınav Programı</h5>
+                <p class="text-muted small">Sınav programını görüntüleyin</p>
+                <a href="{{ url_for('sinav.program') }}" class="btn btn-info">
+                    <i class="bi bi-eye"></i> Görüntüle
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ders Bölüm Düzenleme Modalları -->
+{% for ders in dersler %}
+<div class="modal fade" id="dersBolumModal{{ ders.id }}" tabindex="-1" aria-labelledby="dersBolumModalLabel{{ ders.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="dersBolumModalLabel{{ ders.id }}">
+                    <i class="bi bi-building-gear"></i> {{ ders.ad }} - Bölüm Ataması
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+            <form method="POST" action="{{ url_for('ogretim_uyesi.ders_bolum_guncelle', ders_id=ders.id) }}">
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        Bu ders birden fazla bölümün ortak dersi ise (örn: seçmeli dersler), ilgili bölümleri seçin.
+                        <br><small class="text-muted">İlk seçilen bölüm ana bölüm olarak kabul edilir.</small>
+                    </div>
+                    <div class="row">
+                        {% for bolum in tum_bolumler %}
+                        <div class="col-md-6 mb-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="bolum_ids" 
+                                       value="{{ bolum.id }}" id="ders{{ ders.id }}_bolum_{{ bolum.id }}"
+                                       {% if bolum in ders.tum_bolumler %}checked{% endif %}>
+                                <label class="form-check-label" for="ders{{ ders.id }}_bolum_{{ bolum.id }}">
+                                    <strong>{{ bolum.ad }}</strong>
+                                    <small class="text-muted d-block">{{ bolum.fakulte.ad if bolum.fakulte else '' }}</small>
+                                </label>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-lg"></i> Kaydet
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

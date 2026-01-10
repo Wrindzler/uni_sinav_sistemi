@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Öğrenci Yükle - {{ ders.ad }} - Üniversite Sınav Programı{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>
+                <i class="bi bi-upload"></i> Öğrenci Yükle
+            </h1>
+            <a href="{{ url_for('ders.liste') }}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Geri
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Ders Bilgileri -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card border-primary">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-book"></i> Ders Bilgileri</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Ders Adı:</strong> {{ ders.ad }}</p>
+                        <p><strong>Ders Kodu:</strong> {{ ders.kod }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Mevcut Öğrenci Sayısı:</strong> 
+                            <span class="badge bg-info">{{ mevcut_ogrenci_sayisi }}</span>
+                        </p>
+                        <p><strong>Kayıtlı Öğrenci Sayısı (Ders):</strong> 
+                            <span class="badge bg-secondary">{{ ders.ogrenci_sayisi }}</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Yükleme Formu -->
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-file-earmark-arrow-up"></i> Öğrenci Listesi Yükle</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="dosya" class="form-label">
+                            <i class="bi bi-paperclip"></i> Dosya Seçin (CSV veya Excel)
+                        </label>
+                        <input type="file" class="form-control" id="dosya" name="dosya" 
+                               accept=".csv,.xlsx,.xls" required>
+                        <div class="form-text">
+                            İzin verilen formatlar: CSV, XLSX, XLS
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-upload"></i> Yükle ve Derse Kaydet
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Yardım Kartı -->
+    <div class="col-md-4">
+        <div class="card border-info">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-info-circle"></i> Dosya Formatı</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-2"><strong>CSV veya Excel dosyanız şu sütunları içermelidir:</strong></p>
+                <ol class="small">
+                    <li><strong>Öğrenci No</strong> (zorunlu)</li>
+                    <li><strong>Ad</strong> (zorunlu)</li>
+                    <li><strong>Soyad</strong> (zorunlu)</li>
+                    <li><strong>Email</strong> (opsiyonel)</li>
+                </ol>
+                
+                <hr>
+                
+                <p class="mb-2"><strong>Örnek CSV formatı:</strong></p>
+                <pre class="bg-light p-2 small" style="border-radius: 5px;">ogrenci_no,ad,soyad,email
+20210001,Ahmet,Yılmaz,ahmet@uni.edu
+20210002,Ayşe,Demir,ayse@uni.edu
+20210003,Mehmet,Kaya,mehmet@uni.edu</pre>
+                
+                <hr>
+                
+                <div class="alert alert-warning small mb-0">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <strong>Not:</strong> Eğer öğrenci sistemde yoksa otomatik olarak oluşturulur ve bu derse kaydedilir.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+

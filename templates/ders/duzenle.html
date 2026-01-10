@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Ders Düzenle - Üniversite Sınav Programı{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-warning text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-pencil"></i> Ders Düzenle
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('ders.duzenle', ders_id=ders.id) }}">
+                    <div class="mb-3">
+                        <label for="ad" class="form-label">Ders Adı *</label>
+                        <input type="text" class="form-control" id="ad" name="ad" 
+                               value="{{ ders.ad }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="kod" class="form-label">Ders Kodu</label>
+                        <input type="text" class="form-control" id="kod" name="kod" 
+                               value="{{ ders.kod or '' }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="bolum_id" class="form-label">Bölüm *</label>
+                        <select class="form-select" id="bolum_id" name="bolum_id" required>
+                            {% for bolum in bolumler %}
+                            <option value="{{ bolum.id }}" {% if bolum.id == ders.bolum_id %}selected{% endif %}>
+                                {{ bolum.ad }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="ogretim_uyesi_id" class="form-label">Öğretim Üyesi *</label>
+                        <select class="form-select" id="ogretim_uyesi_id" name="ogretim_uyesi_id" required>
+                            {% for ogretim_uyesi in ogretim_uyeleri %}
+                            <option value="{{ ogretim_uyesi.id }}" {% if ogretim_uyesi.id == ders.ogretim_uyesi_id %}selected{% endif %}>
+                                {{ ogretim_uyesi.tam_ad }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="ogrenci_sayisi" class="form-label">Öğrenci Sayısı *</label>
+                            <input type="number" class="form-control" id="ogrenci_sayisi" 
+                                   name="ogrenci_sayisi" min="0" value="{{ ders.ogrenci_sayisi }}" required>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="sinav_suresi" class="form-label">Sınav Süresi (dk) *</label>
+                            <select class="form-select" id="sinav_suresi" name="sinav_suresi" required>
+                                <option value="30" {% if ders.sinav_suresi == 30 %}selected{% endif %}>30 dakika</option>
+                                <option value="60" {% if ders.sinav_suresi == 60 %}selected{% endif %}>60 dakika</option>
+                                <option value="90" {% if ders.sinav_suresi == 90 %}selected{% endif %}>90 dakika</option>
+                                <option value="120" {% if ders.sinav_suresi == 120 %}selected{% endif %}>120 dakika</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="sinav_turu" class="form-label">Sınav Türü *</label>
+                        <select class="form-select" id="sinav_turu" name="sinav_turu" required>
+                            <option value="yazili" {% if ders.sinav_turu == 'yazili' %}selected{% endif %}>Yazılı</option>
+                            <option value="uygulama" {% if ders.sinav_turu == 'uygulama' %}selected{% endif %}>Uygulama</option>
+                            <option value="proje" {% if ders.sinav_turu == 'proje' %}selected{% endif %}>Proje</option>
+                            <option value="final" {% if ders.sinav_turu == 'final' %}selected{% endif %}>Final</option>
+                            <option value="vize" {% if ders.sinav_turu == 'vize' %}selected{% endif %}>Vize</option>
+                        </select>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('ders.liste') }}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> İptal
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Güncelle
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

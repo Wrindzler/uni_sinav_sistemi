@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}Yeni Özel Durum Ekle - Üniversite Sınav Programı{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-plus-circle"></i> Yeni Özel Durum Ekle
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('ozel_durum.ekle') }}">
+                    <div class="mb-3">
+                        <label for="durum_turu" class="form-label">Durum Türü *</label>
+                        <select class="form-select" id="durum_turu" name="durum_turu" required onchange="toggleFields()">
+                            <option value="">Seçiniz...</option>
+                            <option value="hoca_musaitlik">Hoca Müsaitlik</option>
+                            <option value="ders_sinav_yok">Ders İçin Sınav Yok</option>
+                            <option value="ozel_sure">Özel Sınav Süresi</option>
+                            <option value="ozel_sinif">Özel Sınıf Ata</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="ders_id" class="form-label">Ders (Opsiyonel)</label>
+                        <select class="form-select" id="ders_id" name="ders_id">
+                            <option value="">Seçiniz...</option>
+                            {% for ders in dersler %}
+                            <option value="{{ ders.id }}">{{ ders.ad }} ({{ ders.bolum.ad }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="ogretim_uyesi_id" class="form-label">Öğretim Üyesi (Opsiyonel)</label>
+                        <select class="form-select" id="ogretim_uyesi_id" name="ogretim_uyesi_id">
+                            <option value="">Seçiniz...</option>
+                            {% for ogretim_uyesi in ogretim_uyeleri %}
+                            <option value="{{ ogretim_uyesi.id }}">{{ ogretim_uyesi.tam_ad }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3" id="musait_gunler_div">
+                        <label for="musait_gunler" class="form-label">Müsait Günler</label>
+                        <input type="text" class="form-control" id="musait_gunler" name="musait_gunler" 
+                               placeholder="Pazartesi,Salı,Çarşamba">
+                        <small class="form-text text-muted">Virgülle ayrılmış gün adları (Pazartesi, Salı, vb.)</small>
+                    </div>
+                    
+                    <div class="row mb-3" id="tarih_div">
+                        <div class="col-md-6">
+                            <label for="baslangic_tarihi" class="form-label">Başlangıç Tarihi</label>
+                            <input type="date" class="form-control" id="baslangic_tarihi" name="baslangic_tarihi">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="bitis_tarihi" class="form-label">Bitiş Tarihi</label>
+                            <input type="date" class="form-control" id="bitis_tarihi" name="bitis_tarihi">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3" id="ozel_sure_div">
+                        <label for="ozel_sinav_suresi" class="form-label">Özel Sınav Süresi (dakika)</label>
+                        <input type="number" class="form-control" id="ozel_sinav_suresi" name="ozel_sinav_suresi" 
+                               min="30" step="30" placeholder="30, 60, 90, 120">
+                    </div>
+                    
+                    <div id="ozel_sinif_div" style="display: none;">
+                        <div class="alert alert-info mb-3">
+                            <i class="bi bi-info-circle"></i> Bu ders için özel bir sınıf belirleyin. Sınav sadece bu sınıfta yapılacaktır.
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="ozel_sinif_adi" class="form-label">Sınıf Adı *</label>
+                                <input type="text" class="form-control" id="ozel_sinif_adi" name="ozel_sinif_adi" 
+                                       placeholder="Örn: AMFİA, D301, Lab-1">
+                                <small class="form-text text-muted">Sınavın yapılacağı sınıfın adını yazın</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="ozel_sinif_kapasitesi" class="form-label">Sınıf Kapasitesi *</label>
+                                <input type="number" class="form-control" id="ozel_sinif_kapasitesi" name="ozel_sinif_kapasitesi" 
+                                       min="1" placeholder="Örn: 100, 150, 200">
+                                <small class="form-text text-muted">Sınıfın kaç öğrenci alabileceğini yazın</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="aciklama" class="form-label">Açıklama</label>
+                        <textarea class="form-control" id="aciklama" name="aciklama" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('ozel_durum.liste') }}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> İptal
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Kaydet
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleFields() {
+    const durumTuru = document.getElementById('durum_turu').value;
+    const musaitGunlerDiv = document.getElementById('musait_gunler_div');
+    const tarihDiv = document.getElementById('tarih_div');
+    const ozelSureDiv = document.getElementById('ozel_sure_div');
+    const ozelSinifDiv = document.getElementById('ozel_sinif_div');
+    const dersSelect = document.getElementById('ders_id');
+    
+    // Tüm alanları gizle
+    musaitGunlerDiv.style.display = 'none';
+    tarihDiv.style.display = 'none';
+    ozelSureDiv.style.display = 'none';
+    ozelSinifDiv.style.display = 'none';
+    
+    // Durum türüne göre ilgili alanları göster
+    if (durumTuru === 'hoca_musaitlik') {
+        musaitGunlerDiv.style.display = 'block';
+        tarihDiv.style.display = 'block';
+    } else if (durumTuru === 'ozel_sure') {
+        ozelSureDiv.style.display = 'block';
+    } else if (durumTuru === 'ozel_sinif') {
+        ozelSinifDiv.style.display = 'block';
+        // Ders seçimi zorunlu olsun
+        dersSelect.required = true;
+    }
+    
+    // Özel sınıf dışındaki durumlar için ders zorunlu olmasın
+    if (durumTuru !== 'ozel_sinif') {
+        dersSelect.required = false;
+    }
+}
+</script>
+{% endblock %}
+

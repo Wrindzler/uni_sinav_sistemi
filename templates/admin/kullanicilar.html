@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Kullanıcılar - Üniversite Sınav Programı{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-people"></i> Kullanıcılar</h1>
+        <a href="{{ url_for('auth.register') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Yeni Kullanıcı Ekle
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Kullanıcı Adı</th>
+                                <th>E-posta</th>
+                                <th>Rol</th>
+                                <th>Durum</th>
+                                <th>Oluşturulma Tarihi</th>
+                                <th>İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for kullanici in kullanicilar %}
+                            <tr>
+                                <td>{{ kullanici.kullanici_adi }}</td>
+                                <td>{{ kullanici.email }}</td>
+                                <td>
+                                    <span class="badge bg-{% if kullanici.rol == 'admin' %}danger{% elif kullanici.rol == 'bolum_yetkilisi' %}warning{% elif kullanici.rol == 'hoca' %}info{% else %}secondary{% endif %}">
+                                        {{ kullanici.rol }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if kullanici.aktif %}
+                                    <span class="badge bg-success">Aktif</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">Pasif</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ kullanici.olusturma_tarihi.strftime('%d.%m.%Y') if kullanici.olusturma_tarihi else '-' }}</td>
+                                <td>
+                                    {% if kullanici.kullanici_adi != 'admin' %}
+                                    <form method="POST" action="{{ url_for('admin.kullanici_sil', kullanici_id=kullanici.id) }}" style="display: inline;" onsubmit="return confirm('{{ kullanici.kullanici_adi }} kullanıcısını silmek istediğinize emin misiniz?');">
+                                        <button type="submit" class="btn btn-sm btn-danger">
+                                            <i class="bi bi-trash"></i> Sil
+                                        </button>
+                                    </form>
+                                    {% else %}
+                                    <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

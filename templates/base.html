@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Üniversite Sınav Programı{% endblock %}</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/kostu.png">
+    <link rel="shortcut icon" type="image/png" href="/kostu.png">
+    
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="kostu-layout">
+    {% if current_user.is_authenticated %}
+    <!-- Sol Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="/kostu.png" alt="KOSTÜ Logo" class="sidebar-logo">
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('sinav.program') }}" class="sidebar-link {% if request.endpoint == 'sinav.program' %}active{% endif %}">
+                <i class="bi bi-calendar3"></i>
+                <span>Sınav Programı</span>
+            </a>
+            {% if current_user.is_hoca() or current_user.is_ogrenci() %}
+            <a href="{{ url_for('sinav.benim_sinavlarim') }}" class="sidebar-link {% if request.endpoint == 'sinav.benim_sinavlarim' %}active{% endif %}">
+                <i class="bi bi-calendar-check"></i>
+                <span>Benim Sınavlarım</span>
+            </a>
+            {% endif %}
+            {% if current_user.is_hoca() and current_user.ogretim_uyesi_id %}
+            <a href="{{ url_for('ogretim_uyesi.panel') }}" class="sidebar-link {% if request.endpoint and 'ogretim_uyesi.panel' in request.endpoint or 'ogretim_uyesi.ders_yukle' in request.endpoint %}active{% endif %}">
+                <i class="bi bi-cloud-upload"></i>
+                <span>Ders Yükle</span>
+            </a>
+            {% endif %}
+            {% if current_user.is_admin() or current_user.is_bolum_yetkilisi() %}
+            <a href="{{ url_for('ders.liste') }}" class="sidebar-link {% if request.endpoint and 'ders' in request.endpoint %}active{% endif %}">
+                <i class="bi bi-book"></i>
+                <span>Dersler</span>
+            </a>
+            <a href="{{ url_for('derslik.liste') }}" class="sidebar-link {% if request.endpoint and 'derslik' in request.endpoint %}active{% endif %}">
+                <i class="bi bi-door-open"></i>
+                <span>Derslikler</span>
+            </a>
+            <a href="{{ url_for('ogrenci.liste') }}" class="sidebar-link {% if request.endpoint and 'ogrenci' in request.endpoint %}active{% endif %}">
+                <i class="bi bi-people"></i>
+                <span>Öğrenciler</span>
+            </a>
+            <a href="{{ url_for('ogretim_uyesi.liste') }}" class="sidebar-link {% if request.endpoint and 'ogretim_uyesi' in request.endpoint %}active{% endif %}">
+                <i class="bi bi-person-badge"></i>
+                <span>Öğretim üyeleri</span>
+            </a>
+            <a href="{{ url_for('ozel_durum.liste') }}" class="sidebar-link {% if request.endpoint and 'ozel_durum' in request.endpoint %}active{% endif %}">
+                <i class="bi bi-exclamation-triangle"></i>
+                <span>Özel durumlar</span>
+            </a>
+            {% endif %}
+            {% if current_user.is_admin() %}
+            <a href="{{ url_for('admin.dashboard') }}" class="sidebar-link {% if request.endpoint and 'admin' in request.endpoint %}active{% endif %}">
+                <i class="bi bi-speedometer2"></i>
+                <span>Yönetim</span>
+            </a>
+            <a href="{{ url_for('planlama.index') }}" class="sidebar-link {% if request.endpoint and 'planlama' in request.endpoint %}active{% endif %}">
+                <i class="bi bi-gear"></i>
+                <span>Planlama</span>
+            </a>
+            {% endif %}
+            <a href="{{ url_for('rapor.index') }}" class="sidebar-link {% if request.endpoint and 'rapor' in request.endpoint %}active{% endif %}">
+                <i class="bi bi-file-earmark-text"></i>
+                <span>Raporlar</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Ana İçerik Wrapper -->
+    <div class="main-wrapper">
+        <!-- Üst Header -->
+        <header class="top-header">
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <i class="bi bi-list"></i>
+            </button>
+            <div class="header-title">
+                <h1 class="page-title">
+                    {% block page_title %}
+                        {% if current_user.is_admin() %}
+                            Yönetim Paneli
+                        {% elif current_user.is_bolum_yetkilisi() %}
+                            Bölüm Başkanı Paneli
+                        {% elif current_user.is_hoca() %}
+                            Öğretim Üyesi Paneli
+                        {% elif current_user.is_ogrenci() %}
+                            Öğrenci Paneli
+                        {% else %}
+                            Kullanıcı Paneli
+                        {% endif %}
+                    {% endblock %}
+                </h1>
+            </div>
+            <div class="header-user">
+                <div class="dropdown">
+                    <button class="user-dropdown" type="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-person-circle"></i>
+                        <span>{{ current_user.kullanici_adi }}</span>
+                        <span class="user-role">
+                            {% if current_user.is_admin() %}
+                                Admin
+                            {% elif current_user.is_bolum_yetkilisi() %}
+                                Bölüm Başkanı
+                            {% elif current_user.is_hoca() %}
+                                Öğretim Üyesi
+                            {% elif current_user.is_ogrenci() %}
+                                Öğrenci
+                            {% else %}
+                                {{ current_user.rol }}
+                            {% endif %}
+                        </span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">
+                            <i class="bi bi-box-arrow-right"></i> Çıkış yap
+                        </a></li>
+                    </ul>
+                </div>
+            </div>
+        </header>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-container">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+    </div>
+    {% else %}
+    <!-- Login sayfası için eski yapı -->
+    <div class="login-wrapper" style="background-color: #F8FAFC; min-height: 100vh;">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="container mt-3">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        <div class="container">
+            {% block login_content %}{% endblock %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Footer -->
+    <footer class="text-center py-3 mt-5" style="background-color: #F8FAFC; border-top: 1px solid rgba(15, 23, 42, 0.1);">
+        <div class="container">
+            <img src="/kostu.png" alt="Logo" height="30" style="margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto;">
+            <p class="mb-0" style="color: #64748B; font-size: 0.9rem;">
+                Tüm hakları saklıdır © 2025 Kocaeli Sağlık ve Teknoloji Üniversitesi | Sitedeki içerikler izinsiz kullanılamaz.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery (bazı özellikler için) -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <!-- Chart.js (İstatistikler için) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    
+    <!-- Sidebar Toggle Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebar = document.getElementById('sidebar');
+            const mainWrapper = document.querySelector('.main-wrapper');
+            
+            if (sidebarToggle && sidebar) {
+                sidebarToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('collapsed');
+                    mainWrapper.classList.toggle('sidebar-collapsed');
+                });
+            }
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
+

@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir:*)",
+      "Bash(.venvScriptspython.exe test_excel.py)",
+      "Bash(.venv/Scripts/python.exe test_excel.py)",
+      "Bash(python test_excel.py:*)",
+      "Bash(del \"C:\\Users\\EMRE\\Desktop\\proje27\\test_excel.py\")",
+      "Bash(python -m flask db migrate:*)",
+      "Bash(python add_yakinliklar_column.py:*)",
+      "Bash(python:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

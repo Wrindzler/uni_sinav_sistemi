@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Yeni Öğrenci Ekle - Üniversite Sınav Programı{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-person-plus"></i> Yeni Öğrenci Ekle
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('ogrenci.ekle') }}">
+                    <div class="mb-3">
+                        <label for="ogrenci_no" class="form-label">Öğrenci Numarası *</label>
+                        <input type="text" class="form-control" id="ogrenci_no" name="ogrenci_no" required>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="ad" class="form-label">Ad *</label>
+                            <input type="text" class="form-control" id="ad" name="ad" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="soyad" class="form-label">Soyad *</label>
+                            <input type="text" class="form-control" id="soyad" name="soyad" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="email" class="form-label">E-posta</label>
+                        <input type="email" class="form-control" id="email" name="email">
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('ogrenci.liste') }}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> İptal
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Kaydet
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

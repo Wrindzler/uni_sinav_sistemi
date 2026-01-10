@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Yeni Ders Ekle - Üniversite Sınav Programı{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-plus-circle"></i> Yeni Ders Ekle
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('ders.ekle') }}">
+                    <div class="mb-3">
+                        <label for="ad" class="form-label">Ders Adı *</label>
+                        <input type="text" class="form-control" id="ad" name="ad" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="kod" class="form-label">Ders Kodu</label>
+                        <input type="text" class="form-control" id="kod" name="kod">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="bolum_id" class="form-label">Bölüm *</label>
+                        <select class="form-select" id="bolum_id" name="bolum_id" required>
+                            <option value="">Seçiniz...</option>
+                            {% for bolum in bolumler %}
+                            <option value="{{ bolum.id }}">{{ bolum.ad }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="ogretim_uyesi_id" class="form-label">Öğretim Üyesi *</label>
+                        <select class="form-select" id="ogretim_uyesi_id" name="ogretim_uyesi_id" required>
+                            <option value="">Seçiniz...</option>
+                            {% for ogretim_uyesi in ogretim_uyeleri %}
+                            <option value="{{ ogretim_uyesi.id }}">{{ ogretim_uyesi.tam_ad }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="ogrenci_sayisi" class="form-label">Öğrenci Sayısı *</label>
+                            <input type="number" class="form-control" id="ogrenci_sayisi" 
+                                   name="ogrenci_sayisi" min="0" value="0" required>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="sinav_suresi" class="form-label">Sınav Süresi (dk) *</label>
+                            <select class="form-select" id="sinav_suresi" name="sinav_suresi" required>
+                                <option value="30">30 dakika</option>
+                                <option value="60" selected>60 dakika</option>
+                                <option value="90">90 dakika</option>
+                                <option value="120">120 dakika</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="sinav_turu" class="form-label">Sınav Türü *</label>
+                        <select class="form-select" id="sinav_turu" name="sinav_turu" required>
+                            <option value="yazili" selected>Yazılı</option>
+                            <option value="uygulama">Uygulama</option>
+                            <option value="proje">Proje</option>
+                            <option value="final">Final</option>
+                            <option value="vize">Vize</option>
+                        </select>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('ders.liste') }}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> İptal
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Kaydet
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

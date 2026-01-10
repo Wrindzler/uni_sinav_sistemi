@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Bölümler - Üniversite Sınav Programı{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4"><i class="bi bi-book"></i> Bölümler</h1>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Yeni Bölüm Ekle</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Bölüm Adı *</label>
+                        <input type="text" class="form-control" name="ad" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Bölüm Kodu</label>
+                        <input type="text" class="form-control" name="kod">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Fakülte *</label>
+                        <select class="form-select" name="fakulte_id" required>
+                            <option value="">Seçiniz...</option>
+                            {% for fakulte in fakulteler %}
+                            <option value="{{ fakulte.id }}">{{ fakulte.ad }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Açıklama</label>
+                        <textarea class="form-control" name="aciklama" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Bölümler Listesi</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group">
+                    {% for bolum in bolumler %}
+                    <li class="list-group-item">
+                        <strong>{{ bolum.ad }}</strong>
+                        <span class="text-muted">({{ bolum.fakulte.ad }})</span>
+                        {% if bolum.kod %}
+                        <span class="badge bg-secondary ms-2">{{ bolum.kod }}</span>
+                        {% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

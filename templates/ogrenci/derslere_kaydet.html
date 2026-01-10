@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Öğrenciyi Derslere Kaydet - Üniversite Sınav Programı{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-warning text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-book"></i> Öğrenciyi Derslere Kaydet
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info mb-4">
+                    <strong>Öğrenci:</strong> {{ ogrenci.ogrenci_no }} - {{ ogrenci.tam_ad }}
+                </div>
+                
+                <div class="alert alert-warning mb-4">
+                    <i class="bi bi-info-circle"></i> <strong>Bilgi:</strong> Kayıtlı dersler tikli gösterilir. 
+                    Tiki kaldırarak kaydı silebilir, tiki ekleyerek yeni ders kaydı yapabilirsiniz.
+                </div>
+                
+                <form method="POST" action="{{ url_for('ogrenci.derslere_kaydet', ogrenci_id=ogrenci.id) }}">
+                    <div class="mb-3">
+                        <label class="form-label">Dersler</label>
+                        <div class="border rounded p-3" style="max-height: 500px; overflow-y: auto;">
+                            {% for ders in dersler %}
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" 
+                                       name="ders_ids" value="{{ ders.id }}" 
+                                       id="ders_{{ ders.id }}"
+                                       {% if ders.id in kayitli_ders_ids %}checked{% endif %}>
+                                <label class="form-check-label" for="ders_{{ ders.id }}">
+                                    <strong>{{ ders.ad }}</strong>
+                                    {% if ders.kod %}
+                                    <span class="text-muted">({{ ders.kod }})</span>
+                                    {% endif %}
+                                    - {{ ders.bolum.ad }}
+                                    {% if ders.id in kayitli_ders_ids %}
+                                    <span class="badge bg-success ms-2">Kayıtlı</span>
+                                    {% endif %}
+                                </label>
+                            </div>
+                            {% endfor %}
+                            {% if not dersler %}
+                            <div class="text-muted text-center py-3">
+                                <i class="bi bi-info-circle"></i> Kaydedilebilecek ders bulunamadı.
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('ogrenci.liste') }}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Geri Dön
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Kaydet
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

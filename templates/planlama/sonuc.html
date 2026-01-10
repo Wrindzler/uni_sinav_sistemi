@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}Planlama Sonucu - Üniversite Sınav Programı{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="bi bi-check-circle"></i> Planlama Sonucu
+        </h1>
+    </div>
+</div>
+
+<!-- İstatistikler -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="text-center">
+                <i class="bi bi-book" style="font-size: 2.5rem;"></i>
+                <h2 class="mt-2 mb-0" data-count="{{ sonuc.istatistikler.toplam_ders }}">0</h2>
+                <p class="mb-0 mt-2">Toplam Ders</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card success">
+            <div class="text-center">
+                <i class="bi bi-check-circle" style="font-size: 2.5rem;"></i>
+                <h2 class="mt-2 mb-0" data-count="{{ sonuc.istatistikler.planlanan }}">0</h2>
+                <p class="mb-0 mt-2">Planlanan</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card warning">
+            <div class="text-center">
+                <i class="bi bi-exclamation-triangle" style="font-size: 2.5rem;"></i>
+                <h2 class="mt-2 mb-0" data-count="{{ sonuc.istatistikler.planlanamayan }}">0</h2>
+                <p class="mb-0 mt-2">Planlanamayan</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card info">
+            <div class="text-center">
+                <i class="bi bi-graph-up" style="font-size: 2.5rem;"></i>
+                <h2 class="mt-2 mb-0">%{{ "%.1f"|format(sonuc.istatistikler.basarı_orani) }}</h2>
+                <p class="mb-0 mt-2">Başarı Oranı</p>
+                <div class="progress mt-2" style="height: 8px;">
+                    <div class="progress-bar bg-white" role="progressbar" 
+                         style="width: {{ sonuc.istatistikler.basarı_orani }}%"
+                         data-progress="{{ sonuc.istatistikler.basarı_orani }}">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Planlanamayan Dersler -->
+{% if sonuc.hatalar %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card border-warning">
+            <div class="card-header bg-warning">
+                <h5 class="mb-0">
+                    <i class="bi bi-exclamation-triangle"></i> Planlanamayan Dersler
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Ders Adı</th>
+                                <th>Bölüm</th>
+                                <th>Öğrenci Sayısı</th>
+                                <th>Neden</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for hata in sonuc.hatalar %}
+                            <tr>
+                                <td>{{ hata.ders.ad }}</td>
+                                <td>{{ hata.ders.bolum.ad }}</td>
+                                <td>{{ hata.ders.ogrenci_sayisi }}</td>
+                                <td><span class="badge bg-warning">{{ hata.neden }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- İşlem Butonları -->
+<div class="row">
+    <div class="col-12 text-center">
+        <a href="{{ url_for('sinav.program') }}" class="btn btn-primary btn-lg me-2">
+            <i class="bi bi-calendar3"></i> Sınav Programını Görüntüle
+        </a>
+        <a href="{{ url_for('planlama.index') }}" class="btn btn-secondary btn-lg">
+            <i class="bi bi-arrow-left"></i> Geri Dön
+        </a>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+// İstatistik kartlarındaki sayıları animasyonlu göster
+document.addEventListener('DOMContentLoaded', function() {
+    const statNumbers = document.querySelectorAll('[data-count]');
+    statNumbers.forEach(element => {
+        const target = parseInt(element.getAttribute('data-count'));
+        animateNumber(element, target, 1500);
+    });
+    
+    // Progress bar animasyonu
+    const progressBars = document.querySelectorAll('[data-progress]');
+    progressBars.forEach(bar => {
+        const target = parseFloat(bar.getAttribute('data-progress'));
+        animateProgressBar(bar, target);
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}
+
