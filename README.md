@@ -12,6 +12,93 @@
 </p>
 
 ---
+## Screenshots
+
+<details>
+<summary>View Screenshots</summary>
+
+<br>
+
+<p align="center">
+  <img src="user-login.png" width="800">
+  <br>
+  <strong>User Login Screen</strong>
+</p>
+
+<p align="center">
+  <img src="admin-dashboard.png" width="800">
+  <br>
+  <strong>Admin Dashboard Home</strong>
+</p>
+
+<p align="center">
+  <img src="course-management.png" width="800">
+  <br>
+  <strong>Course Management Screen</strong>
+</p>
+
+<p align="center">
+  <img src="classroom-management.png" width="800">
+  <br>
+  <strong>Classroom Management Screen</strong>
+</p>
+
+<p align="center">
+  <img src="exam-scheduling.png" width="800">
+  <br>
+  <strong>Exam Scheduling Screen</strong>
+</p>
+
+<p align="center">
+  <img src="student-management.png" width="800">
+  <br>
+  <strong>Student Management Screen</strong>
+</p>
+
+<p align="center">
+  <img src="instructor-management.png" width="800">
+  <br>
+  <strong>Instructor Management Screen</strong>
+</p>
+
+<p align="center">
+  <img src="special-case-management.png" width="800">
+  <br>
+  <strong>Special Case Management Screen</strong>
+</p>
+
+<p align="center">
+  <img src="management-panel.png" width="800">
+  <br>
+  <strong>Management Panel</strong>
+</p>
+
+<p align="center">
+  <img src="reporting.png" width="800">
+  <br>
+  <strong>Reporting Screen</strong>
+</p>
+
+<p align="center">
+  <img src="exam-timetable.png" width="800">
+  <br>
+  <strong>Exam Timetable Panel</strong>
+</p>
+
+<p align="center">
+  <img src="my-exams.png" width="800">
+  <br>
+  <strong>My Exams Panel</strong>
+</p>
+
+<p align="center">
+  <img src="database-viewer.png" width="800">
+  <br>
+  <strong>Database Viewer Screen</strong>
+</p>
+
+</details>
+
 
 ## Quick Access
 
@@ -67,9 +154,7 @@ flowchart LR
     C -->|Context Data| F
     F -->|Rendered UI| A
 ```
-
-<details>
-<summary><strong>Explore Directory Structure</strong> <i>(Click to expand)</i></summary>
+## Explore Directory Structure
 
 ```text
 project-root/
